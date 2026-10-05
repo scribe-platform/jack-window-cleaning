@@ -38,49 +38,41 @@ collections:
         isBody: true
     form: false
   - name: inquiries
-    label: Inquiries
+    label: Quote Requests
+    description: Quote requests from the contact page.
     path: content/inquiries
     format: yaml
+    form: true
     fields:
       - name: name
         type: string
         required: true
-        hidden: false
-        readonly: false
-        isBody: false
       - name: email
         type: string
         required: true
-        hidden: false
-        readonly: false
-        isBody: false
+      - name: phone
+        type: string
+        label: Phone
+      - name: service
+        type: string
+        label: Package of interest
       - name: message
         type: text
+        label: Tell us about your windows
         required: true
-        hidden: false
-        readonly: false
-        isBody: false
-    form: true
     workflow:
       states:
         - name: new
           label: New
           kind: needs-you
-          hidden: false
-        - name: open
-          label: Open
-          kind: needs-you
-          hidden: false
-        - name: waiting
-          label: Waiting on customer
+        - name: quoted
+          label: Quoted
           kind: waiting
-          hidden: false
-        - name: done
-          label: Done
+        - name: booked
+          label: Booked
           kind: closed
-          hidden: false
-        - name: archived
-          label: Archived
+        - name: spam
+          label: Spam
           kind: closed
           hidden: true
   - name: packages
@@ -95,18 +87,41 @@ collections:
       - name: title
         type: string
         required: true
+        hidden: false
+        readonly: false
+        isBody: false
       - name: tagline
         type: string
+        required: false
+        hidden: false
+        readonly: false
+        isBody: false
       - name: price
         type: string
         label: Price (e.g. "From $149")
         required: true
+        hidden: false
+        readonly: false
+        isBody: false
       - name: features
         type: text
         label: Features (one per line)
+        required: false
+        hidden: false
+        readonly: false
+        isBody: false
       - name: featured
         type: boolean
         label: Highlight as most popular
+        required: false
+        hidden: false
+        readonly: false
+        isBody: false
       - name: order
         type: number
         label: Sort order
+        required: false
+        hidden: false
+        readonly: false
+        isBody: false
+    form: false
