@@ -15,26 +15,98 @@ collections:
       - name: title
         type: string
         required: true
+        hidden: false
+        readonly: false
+        isBody: false
       - name: date
         type: date
         required: true
+        hidden: false
+        readonly: false
+        isBody: false
       - name: heroImage
         type: image
+        required: false
+        hidden: false
+        readonly: false
+        isBody: false
       - name: body
         type: rich-text
+        required: false
+        hidden: false
+        readonly: false
         isBody: true
+    form: false
   - name: inquiries
     label: Inquiries
     path: content/inquiries
     format: yaml
-    form: true
     fields:
       - name: name
         type: string
         required: true
+        hidden: false
+        readonly: false
+        isBody: false
       - name: email
         type: string
         required: true
+        hidden: false
+        readonly: false
+        isBody: false
       - name: message
         type: text
         required: true
+        hidden: false
+        readonly: false
+        isBody: false
+    form: true
+    workflow:
+      states:
+        - name: new
+          label: New
+          kind: needs-you
+          hidden: false
+        - name: open
+          label: Open
+          kind: needs-you
+          hidden: false
+        - name: waiting
+          label: Waiting on customer
+          kind: waiting
+          hidden: false
+        - name: done
+          label: Done
+          kind: closed
+          hidden: false
+        - name: archived
+          label: Archived
+          kind: closed
+          hidden: true
+  - name: packages
+    label: Service Packages
+    description: The cleaning packages shown on the Services page.
+    path: content/packages
+    format: yaml
+    view:
+      primary: title
+      sort: order
+    fields:
+      - name: title
+        type: string
+        required: true
+      - name: tagline
+        type: string
+      - name: price
+        type: string
+        label: Price (e.g. "From $149")
+        required: true
+      - name: features
+        type: text
+        label: Features (one per line)
+      - name: featured
+        type: boolean
+        label: Highlight as most popular
+      - name: order
+        type: number
+        label: Sort order
