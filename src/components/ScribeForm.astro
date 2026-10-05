@@ -1,0 +1,120 @@
+---
+export interface Props {
+  site: string;
+  collection: string;
+  turnstileSiteKey: string;
+  apiBase?: string;
+}
+const {
+  site, collection, turnstileSiteKey,
+  apiBase = import.meta.env.PUBLIC_SCRIBE_API_URL || 'https://scribe.weaverdigital.io',
+} = Astro.props;
+const formId = `scribe-form-${collection}`;
+---
+<form id={formId} class="quote" data-site={site} data-collection={collection} data-endpoint={`${apiBase}/api/submissions`} data-scribe-retry>
+  <div class="row">
+    <label>Your name<input name="name" type="text" required autocomplete="name" /></label>
+    <label>Email<input name="email" type="email" required autocomplete="email" /></label>
+  </div>
+  <div class="row">
+    <label>Phone <span class="opt">(optional)</span><input name="phone" type="tel" autocomplete="tel" /></label>
+    <label>Package of interest
+      <select name="service">
+        <option value="">Not sure yet</option>
+        <option>The Sparkle</option>
+        <option>The Crystal Clear</option>
+        <option>The Year-Round</option>
+        <option>Storefront &amp; Office</option>
+      </select>
+    </label>
+  </div>
+  <label>Tell us about your windows<textarea name="message" rows="5" required placeholder="Roughly how many windows? One story or two? Anything tricky?"></textarea></label>
+  <div class="cf-turnstile" data-sitekey={turnstileSiteKey}></div>
+  <button type="submit" class="btn">Request my free quote</button>
+  <p class="form-status" role="status" aria-live="polite"></p>
+</form>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script is:inline define:vars={{ formId }}>
+  (function () {
+    const form = document.getElementById(formId);
+    if (!form) return;
+    const statusEl = form.querySelector('.form-status');
+    const say = (m) => { if (statusEl) statusEl.textContent = m; };
+    const { site, collection, endpoint } = form.dataset;
+    const storageKey = `scribe_pending_submission_${site}_${collection}`;
+    const UNREACHABLE = "We couldn't send that yet — it's saved and will retry.";
+    const GENERIC = "We couldn't send that. Please try again, or call us instead.";
+
+    const readPending  = () => { try { return JSON.parse(localStorage.getItem(storageKey)) ?? null; } catch { return null; } };
+    const savePending  = (p) => { try { localStorage.setItem(storageKey, JSON.stringify(p)); } catch {} };
+    const clearPending = ()  => { try { localStorage.removeItem(storageKey); } catch {} };
+
+    function collect() {
+      const payload = {};
+      for (const el of form.elements) {
+        if (!el.name) continue;
+        payload[el.name] = el.value;
+      }
+      return payload;
+    }
+
+    async function send(payload) {
+      const url = `${endpoint}?site=${encodeURIComponent(site)}&collection=${encodeURIComponent(collection)}`;
+      const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (res.ok) return;
+      const body = await res.json().catch(() => ({}));
+      const error = new Error((body.error ?? '').trim() || GENERIC);
+      error.answered = true;
+      error.retryable = res.status >= 500;
+      throw error;
+    }
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = collect();
+      say('Sending…');
+      try {
+        await send(payload);
+        clearPending();
+        form.reset();
+        if (window.turnstile) window.turnstile.reset();
+        say("Thanks — we got it. Jack will be in touch within one business day.");
+      } catch (err) {
+        if (err.answered) {
+          if (err.retryable) savePending(payload);
+          say(err.message);
+          return;
+        }
+        savePending(payload);
+        say(UNREACHABLE);
+      }
+    });
+
+    (async function retryPending() {
+      const pending = readPending();
+      if (!pending) return;
+      try {
+        await send(pending);
+        clearPending();
+        say('Thanks — we got it.');
+      } catch (err) {
+        if (err.answered && !err.retryable) { clearPending(); say(err.message); }
+      }
+    })();
+  })();
+</script>
+
+<style>
+  .quote { display: grid; gap: 1.1rem; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.1rem; }
+  label { display: grid; gap: 0.4rem; font-weight: 600; font-size: 0.95rem; }
+  .opt { font-weight: 400; opacity: 0.6; }
+  input, select, textarea {
+    font: 400 1rem var(--body); color: var(--ink);
+    padding: 0.85rem 1rem; border-radius: 12px; border: 2px solid var(--line); background: var(--white);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px rgba(27, 138, 138, 0.18); }
+  .form-status { margin: 0; min-height: 1.5em; font-weight: 500; color: var(--teal); }
+</style>

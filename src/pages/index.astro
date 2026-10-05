@@ -1,0 +1,132 @@
+---
+import Base from '../layouts/Base.astro';
+import { href, loadPackages } from '../lib/scribe';
+const packages = loadPackages().slice(0, 3);
+const steps = [
+  { n: '01', t: 'Tell us about your place', d: 'Send a quick note or call. We quote within one business day, no pressure.' },
+  { n: '02', t: 'We show up on time', d: 'Uniformed, insured, and careful with your screens, sills and landscaping.' },
+  { n: '03', t: 'Squeegee, rinse, done', d: 'Hand-washed pane by pane. Not happy? We re-clean free within 7 days.' },
+];
+const proof = [
+  { q: 'I didn’t realize how dirty my windows were until Jack left. The whole kitchen feels brighter.', a: 'Karen M., Lititz' },
+  { q: 'Our storefront has never looked this good. They’re in and out before we open.', a: 'Dan R., Lancaster Coffee Co.' },
+  { q: 'Zero streaks, zero mess, and he even fixed a torn screen. Booked the year-round plan.', a: 'Priya S., Manheim' },
+];
+---
+<Base title="Jack Window Cleaning — Streak-free windows in Lancaster, PA" current="home">
+  <section class="hero">
+    <div class="streak s1"></div><div class="streak s2"></div><div class="streak s3"></div>
+    <div class="wrap hero-inner">
+      <p class="eyebrow">Lancaster County &middot; Fully insured</p>
+      <h1><span class="wipe">Clean windows.</span><br /><span class="wipe d2">Clear <em>view.</em></span></h1>
+      <p class="lead">Hand-washed, squeegee-finished, and guaranteed streak-free. Homes and storefronts, done right by a local crew that treats your glass like their own.</p>
+      <div class="ctas">
+        <a class="btn" href={href('contact/')}>Get a free quote</a>
+        <a class="btn ghost" href={href('services/')}>See packages</a>
+      </div>
+      <ul class="badges">
+        <li><strong>10+</strong> years</li>
+        <li><strong>4,000+</strong> homes cleaned</li>
+        <li><strong>5.0</strong> average rating</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <p class="eyebrow">How it works</p>
+    <h2>Three steps to see-through.</h2>
+    <div class="steps">
+      {steps.map((s) => (
+        <article class="step">
+          <span class="num">{s.n}</span>
+          <h3>{s.t}</h3>
+          <p>{s.d}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <div class="band-head">
+        <div>
+          <p class="eyebrow light">Popular packages</p>
+          <h2>Pick a package. Or let us tailor one.</h2>
+        </div>
+        <a class="btn" href={href('services/')}>All services</a>
+      </div>
+      <div class="mini">
+        {packages.map((p) => (
+          <a class="mini-card" href={href('services/')}>
+            <h3>{p.title}</h3>
+            <p>{p.tagline}</p>
+            <strong>{p.price}</strong>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap section">
+    <p class="eyebrow">Neighbors say</p>
+    <h2>Don’t take our word for it.</h2>
+    <div class="quotes">
+      {proof.map((p) => (
+        <blockquote>
+          <p>“{p.q}”</p>
+          <footer>{p.a}</footer>
+        </blockquote>
+      ))}
+    </div>
+  </section>
+
+  <section class="wrap cta-block">
+    <h2>Ready for a brighter view?</h2>
+    <p>Free quotes, usually within a day.</p>
+    <a class="btn" href={href('contact/')}>Request a quote</a>
+  </section>
+</Base>
+
+<style>
+  .hero { position: relative; overflow: hidden; padding: clamp(4rem, 10vw, 8rem) 0 clamp(3rem, 7vw, 5rem); background: linear-gradient(160deg, #f6fbfa 0%, var(--glass-deep) 100%); }
+  .hero-inner { position: relative; z-index: 1; }
+  .streak { position: absolute; top: -20%; height: 150%; width: 70px; transform: rotate(24deg); background: linear-gradient(90deg, transparent, rgba(255,255,255,0.75), transparent); }
+  .s1 { right: 18%; width: 140px; } .s2 { right: 9%; width: 36px; } .s3 { right: 28%; width: 18px; }
+  h1 { font-size: clamp(3rem, 9vw, 7rem); font-weight: 800; }
+  h1 em { font-style: normal; color: var(--teal); }
+  .wipe { display: inline-block; animation: wipe 0.9s cubic-bezier(.7,0,.2,1) both; }
+  .d2 { animation-delay: 0.25s; }
+  @keyframes wipe { from { clip-path: inset(0 100% 0 0); transform: translateX(-12px); } to { clip-path: inset(0 0 0 0); transform: none; } }
+  .lead { max-width: 34rem; font-size: 1.25rem; color: var(--ink-soft); margin: 1.5rem 0 2rem; animation: rise 0.8s 0.5s both; }
+  .ctas { display: flex; flex-wrap: wrap; gap: 1rem; animation: rise 0.8s 0.65s both; }
+  .badges { display: flex; flex-wrap: wrap; gap: 0.75rem 2.5rem; list-style: none; padding: 0; margin: 3rem 0 0; color: var(--ink-soft); }
+  .badges strong { font: 800 1.6rem var(--display); color: var(--ink); margin-right: 0.3rem; }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  .section { padding-top: clamp(3.5rem, 8vw, 6rem); }
+  h2 { font-size: clamp(2rem, 5vw, 3.4rem); font-weight: 800; }
+  .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
+  .step { background: var(--white); border-radius: 22px; padding: 1.8rem; border: 1px solid var(--line); }
+  .num { font: 800 0.95rem var(--display); background: var(--sun); border-radius: 99px; padding: 0.2rem 0.7rem; }
+  .step h3 { font-size: 1.5rem; margin: 1.1rem 0 0.6rem; }
+  .step p { margin: 0; color: var(--ink-soft); }
+
+  .band { background: var(--ink); color: var(--white); padding: clamp(3rem, 7vw, 5rem) 0; margin-top: clamp(3.5rem, 8vw, 6rem); }
+  .eyebrow.light { color: var(--mint); }
+  .band-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1.5rem; margin-bottom: 2.5rem; }
+  .band-head h2 { max-width: 22ch; }
+  .mini { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; }
+  .mini-card { display: block; text-decoration: none; padding: 1.6rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.18); transition: background 0.2s, transform 0.2s; }
+  .mini-card:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); }
+  .mini-card h3 { font-size: 1.5rem; }
+  .mini-card p { color: #b9d3d6; margin: 0.5rem 0 1rem; }
+  .mini-card strong { font: 700 1.2rem var(--display); color: var(--sun); }
+
+  .quotes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-top: 2.5rem; }
+  blockquote { margin: 0; padding: 1.8rem; border-left: 5px solid var(--sun); background: var(--white); border-radius: 0 20px 20px 0; }
+  blockquote p { margin: 0 0 1rem; font-size: 1.1rem; }
+  blockquote footer { font-weight: 600; color: var(--teal); }
+
+  .cta-block { text-align: center; padding-top: clamp(4rem, 9vw, 7rem); }
+  .cta-block p { color: var(--ink-soft); margin: 0.75rem 0 1.75rem; }
+</style>

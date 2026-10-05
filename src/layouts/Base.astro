@@ -1,0 +1,123 @@
+---
+import { loadScribeSchema, href } from '../lib/scribe';
+const { umamiWebsiteId, umamiScriptUrl } = loadScribeSchema();
+const { title, description = 'Streak-free window cleaning for homes and storefronts in Lancaster, PA.', current = '' } = Astro.props;
+const nav = [
+  { key: 'home', label: 'Home', to: '' },
+  { key: 'services', label: 'Services', to: 'services/' },
+  { key: 'contact', label: 'Get a Quote', to: 'contact/' },
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href={href('favicon.svg')} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+    {umamiWebsiteId && umamiScriptUrl && (
+      <script defer src={umamiScriptUrl} data-website-id={umamiWebsiteId}></script>
+    )}
+  </head>
+  <body>
+    <header class="top">
+      <a class="brand" href={href()}>
+        <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#0B2230"/><path d="M14 46 46 14" stroke="#FFD23F" stroke-width="7" stroke-linecap="round"/><path d="M26 50 50 26" stroke="#7FD6D0" stroke-width="4" stroke-linecap="round"/></svg>
+        <span>Jack <em>Window Cleaning</em></span>
+      </a>
+      <nav>
+        {nav.map((n) => (
+          <a href={href(n.to)} class:list={[{ active: current === n.key }, n.key === 'contact' && 'cta']}>{n.label}</a>
+        ))}
+      </nav>
+    </header>
+
+    <main><slot /></main>
+
+    <footer class="foot">
+      <div class="wrap foot-grid">
+        <div>
+          <p class="foot-brand">Jack Window Cleaning</p>
+          <p>Fully insured &middot; Serving Lancaster County since 2014</p>
+        </div>
+        <div>
+          <p>(717) 555-0142</p>
+          <p>hello@jackwindowcleaning.example</p>
+        </div>
+        <div>
+          <p>Mon&ndash;Sat &middot; 7am&ndash;6pm</p>
+          <p class="fine">Demo site &mdash; all details are fictional.</p>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --ink: #0b2230;
+    --ink-soft: #3d5663;
+    --glass: #eef7f6;
+    --glass-deep: #d9eeec;
+    --teal: #1b8a8a;
+    --mint: #7fd6d0;
+    --sun: #ffd23f;
+    --white: #fff;
+    --line: rgba(11, 34, 48, 0.12);
+    --display: 'Bricolage Grotesque', 'Helvetica Neue', sans-serif;
+    --body: 'Hanken Grotesk', 'Helvetica Neue', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--glass);
+    color: var(--ink);
+    font: 400 1.05rem/1.65 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3 { font-family: var(--display); line-height: 1.02; letter-spacing: -0.02em; margin: 0; }
+  a { color: inherit; }
+  .wrap { width: min(1120px, 100% - 2.5rem); margin-inline: auto; }
+
+  .top {
+    position: sticky; top: 0; z-index: 10;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem;
+    padding: 0.85rem max(1.25rem, calc((100% - 1120px) / 2));
+    background: rgba(238, 247, 246, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line);
+  }
+  .brand { display: flex; align-items: center; gap: 0.7rem; text-decoration: none; font: 800 1.2rem var(--display); letter-spacing: -0.02em; }
+  .brand em { font-style: normal; font-weight: 500; color: var(--teal); }
+  .top nav { display: flex; align-items: center; gap: 0.25rem; }
+  .top nav a { text-decoration: none; font-weight: 500; padding: 0.5rem 0.9rem; border-radius: 99px; transition: background 0.2s; }
+  .top nav a:hover { background: var(--glass-deep); }
+  .top nav a.active:not(.cta) { background: var(--glass-deep); }
+  .top nav a.cta { background: var(--ink); color: var(--white); margin-left: 0.4rem; }
+  .top nav a.cta:hover { background: var(--teal); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--sun); color: var(--ink); text-decoration: none; border: 0; cursor: pointer;
+    font: 700 1.05rem var(--display); padding: 0.95rem 1.7rem; border-radius: 99px;
+    box-shadow: 0 6px 0 rgba(11, 34, 48, 0.9); transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:hover { transform: translateY(3px); box-shadow: 0 3px 0 rgba(11, 34, 48, 0.9); }
+  .btn.ghost { background: transparent; box-shadow: inset 0 0 0 2px var(--ink); }
+  .btn.ghost:hover { background: var(--ink); color: var(--white); }
+
+  .eyebrow { font: 600 0.8rem var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--teal); margin: 0 0 1rem; }
+
+  .foot { background: var(--ink); color: #cfe3e6; padding: 3rem 0; margin-top: 5rem; }
+  .foot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+  .foot p { margin: 0 0 0.25rem; }
+  .foot-brand { font: 800 1.3rem var(--display); color: var(--white); }
+  .fine { font-size: 0.85rem; opacity: 0.6; }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
