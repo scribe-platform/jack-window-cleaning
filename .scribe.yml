@@ -1,4 +1,5 @@
 site: jack-window-cleaning
+environment: production
 turnstileSiteKey: 0x4AAAAAAFHtLCWg1S7IznJp
 umamiWebsiteId: 59dbc856-65e1-48c3-95b4-07777e6c3982
 umamiScriptUrl: https://analytics.weaverdigital.io/script.js
