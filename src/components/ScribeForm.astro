@@ -5,10 +5,39 @@ export interface Props {
   turnstileSiteKey: string;
   apiBase?: string;
 }
-const {
-  site, collection, turnstileSiteKey,
-  apiBase = import.meta.env.PUBLIC_SCRIBE_API_URL || 'https://scribe.weaverdigital.io',
-} = Astro.props;
+// Where this Site's forms post. `PUBLIC_SCRIBE_API_URL` is an **organisation**
+// variable on the GitHub org that owns this repo, passed to the build by
+// `deploy.yml`, and it has **no default in a production build** (RFC 0025).
+//
+// It used to fall back to the production admin, which is the failure that rule
+// exists to end: a `PUBLIC_*` value is inlined into the client bundle at build
+// time, so a Site that guessed shipped the wrong endpoint and posted a Visitor's
+// message to whichever Scribe the fallback named — noticed, if ever, by a Client
+// wondering why nobody replied. Failing the build is the cheap version of that.
+//
+// GitHub resolves an unset `vars.*` to an empty string rather than leaving it
+// undefined, so empty has to count as missing. Dev falls back to a *local*
+// admin, never production, so `npm run dev` needs no env file and still cannot
+// write to a real Client's database by omission.
+function scribeApiBase(): string {
+  const configured = import.meta.env.PUBLIC_SCRIBE_API_URL?.trim();
+  if (configured) return configured;
+  if (import.meta.env.PROD) {
+    throw new Error(
+      'PUBLIC_SCRIBE_API_URL is unset. Set it as an organisation variable on the GitHub org that owns ' +
+        'this repo — it has no default in a production build, so this Site posts nowhere by accident.',
+    );
+  }
+  return 'http://localhost:3040';
+}
+
+const { site, collection, turnstileSiteKey, apiBase: apiBaseProp } = Astro.props;
+
+// Resolved after the props, and only when the endpoint was not passed in:
+// `scribeApiBase()` throws, and a caller who named the endpoint has already
+// answered the question it would throw about. A default in the destructuring
+// would evaluate unconditionally and make that escape hatch a lie.
+const apiBase = apiBaseProp ?? scribeApiBase();
 const formId = `scribe-form-${collection}`;
 ---
 <form id={formId} class="quote" data-site={site} data-collection={collection} data-endpoint={`${apiBase}/api/submissions`} data-scribe-retry>
